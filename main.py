@@ -9,12 +9,18 @@ WIDTH,HEIGHT = 700, 500
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Clique no alvo")
 
+# Definição de constantes
 INCREMENTO_DO_ALVO = 400
 ALVO_EVENT = pygame.USEREVENT
 
 PADDING_DO_ALVO = 30
 
 BG_COLOR = (40, 40, 90)
+VIDAS = 3
+TOP_HEIGHT = 50
+
+LABEL_FONT = pygame.font.SysFont("comicsans", 24)
+
 
 class Alvo:
     MAX_SIZE = 30
@@ -47,14 +53,28 @@ class Alvo:
         dis = math.sqrt((x - self.x)**2 +(y - self.y)**2)
         return dis <= self.size
 
+# limpa tela  
 def draw(win, alvos):
     win.fill(BG_COLOR)
 
     for alvo in alvos:
         alvo.draw(win)
-    pygame.display.update()
 
-        
+
+def format_time(secs):
+    milli = math.floor(int(secs * 1000 % 1000) / 100)
+    seconds = int(round(secs % 60, 1))
+    minutes = int(secs // 60)
+
+    return f"{minutes:02d}:{seconds:02d}.{milli}"
+
+
+def draw_top(win, elapsed_time, alvo_clicado, perdas):
+    pygame.draw.rect(win, "grey", (0, 0, WIDTH,TOP_HEIGHT))
+    time_label = LABEL_FONT.render(f"Time: {format_time(elapsed_time)}", 1, "black")
+
+    win.blit(time_label, (5, 5))
+
 # loop principal
 def main():
     run = True
@@ -72,6 +92,7 @@ def main():
         clock.tick(60)
         click = False
         mouse_pos = pygame.mouse.get_pos()
+        elapsed_time = time.time() - start_time
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -99,9 +120,12 @@ def main():
                 alvos.remove(alvo)
                 alvo_clicado += 1
 
-
+        if perdas >= VIDAS:
+            pass 
 
         draw(WIN, alvos)
+        draw_top(WIN, elapsed_time, alvo_clicado, perdas)
+        pygame.display.update()
 
 
 if __name__ == "__main__":

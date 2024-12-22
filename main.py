@@ -14,12 +14,12 @@ ALVO_EVENT = pygame.USEREVENT
 
 PADDING_DO_ALVO = 30
 
-BG_COLOR = (1, 30, 45)
+BG_COLOR = (40, 40, 90)
 
 class Alvo:
     MAX_SIZE = 30
     GROWTH_RATE = 0.2
-    COLOR = (255, 0, 0)
+    COLOR = (220, 30, 10)
     SECOND_COLOR = (255, 255, 255)
 
     def __init__(self, x, y):
@@ -43,12 +43,15 @@ class Alvo:
         pygame.draw.circle(win, self.COLOR,(self.x, self.y), self.size * 0.6)
         pygame.draw.circle(win, self.SECOND_COLOR,(self.x, self.y), self.size * 0.4)
 
+    def collide(self, x, y):
+        dis = math.sqrt((x - self.x)**2 +(y - self.y)**2)
+        return dis <= self.size
+
 def draw(win, alvos):
     win.fill(BG_COLOR)
 
     for alvo in alvos:
         alvo.draw(win)
-
     pygame.display.update()
 
         
@@ -56,10 +59,20 @@ def draw(win, alvos):
 def main():
     run = True
     alvos = []
+    clock = pygame.time.Clock()
+
+    alvo_clicado = 0
+    clicks = 0
+    perdas = 0
+    start_time = time.time()
 
     pygame.time.set_timer(ALVO_EVENT, INCREMENTO_DO_ALVO)
 
     while run:
+        clock.tick(60)
+        click = False
+        mouse_pos = pygame.mouse.get_pos()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -70,9 +83,23 @@ def main():
                 y = random.randint(PADDING_DO_ALVO, HEIGHT - PADDING_DO_ALVO)
                 alvo = Alvo(x, y)
                 alvos.append(alvo)
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                    click = True
+                    clicks += 1
         
         for alvo in alvos:
             alvo.update()
+
+            if alvo.size <= 0:
+                alvos.remove(alvo)
+                perdas += 1
+
+            if click and alvo.collide(*mouse_pos):
+                alvos.remove(alvo)
+                alvo_clicado += 1
+
+
 
         draw(WIN, alvos)
 

@@ -3,7 +3,7 @@ import random
 import time
 import pygame
 pygame.init()
-
+    
 WIDTH,HEIGHT = 700, 500
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -19,7 +19,7 @@ BG_COLOR = (40, 40, 90)
 VIDAS = 3
 TOP_HEIGHT = 50
 
-LABEL_FONT = pygame.font.SysFont("comicsans", 24)
+LABEL_FONT = pygame.font.SysFont("comicsans", 18)
 
 
 class Alvo:
@@ -68,12 +68,52 @@ def format_time(secs):
 
     return f"{minutes:02d}:{seconds:02d}.{milli}"
 
-
+# 1- Dados na tela enquanto o jogo roda
 def draw_top(win, elapsed_time, alvo_clicado, perdas):
     pygame.draw.rect(win, "grey", (0, 0, WIDTH,TOP_HEIGHT))
-    time_label = LABEL_FONT.render(f"Time: {format_time(elapsed_time)}", 1, "black")
+    time_label = LABEL_FONT.render(f"Tempo: {format_time(elapsed_time)}", 1, "black")
+
+    speed = round(alvo_clicado / elapsed_time, 1)
+    speed_label = LABEL_FONT.render(f"Velocidade: {speed} t/s", 1, "black")
+
+    hits_label = LABEL_FONT.render(f"Pontos: {alvo_clicado}", 1, "black")
+
+    vidas_label = LABEL_FONT.render(f"Vidas: {VIDAS - perdas}", 1, "black")
 
     win.blit(time_label, (5, 5))
+    win.blit(speed_label, (200, 5))
+    win.blit(hits_label, (400, 5))
+    win.blit(vidas_label, (580, 5))
+
+# 2 - Dados no meio da tela quando termina o jogo
+def end_screen(win, elapsed_time, alvo_clicado, click):
+    win.blit(BG_COLOR)
+
+    time_label = LABEL_FONT.render(f"Tempo: {format_time(elapsed_time)}", 1, "black")
+
+    speed = round(alvo_clicado / elapsed_time, 1)
+    speed_label = LABEL_FONT.render(f"Velocidade: {speed} t/s", 1, "black")
+
+    hits_label = LABEL_FONT.render(f"Pontos: {alvo_clicado}", 1, "black")
+
+    accuracy = round(alvo_clicado / click * 100, 1)
+    accuracy_label = LABEL_FONT.render(f"Precisão: {accuracy}%", 1, "black")
+
+    win.blit(time_label, (get_middle(time_label), 5))
+    win.blit(speed_label, (get_middle(speed_label), 5))
+    win.blit(hits_label, (get_middle(hits_label), 5))
+    win.blit(accuracy_label, (get_middle(accuracy_label), 5))
+
+    pygame.display.update()
+
+    run = True
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or event.type == pygame.KEYDOWN:
+                quit()
+
+def get_middle(surface):
+    return WIDTH / 2 - surface.get_width()/ 2
 
 # loop principal
 def main():
@@ -100,7 +140,7 @@ def main():
                 break
 
             if event.type == ALVO_EVENT:
-                x = random.randint(PADDING_DO_ALVO, WIDTH - PADDING_DO_ALVO)
+                x = random.randint(PADDING_DO_ALVO + TOP_HEIGHT, HEIGHT - PADDING_DO_ALVO)
                 y = random.randint(PADDING_DO_ALVO, HEIGHT - PADDING_DO_ALVO)
                 alvo = Alvo(x, y)
                 alvos.append(alvo)
@@ -121,12 +161,13 @@ def main():
                 alvo_clicado += 1
 
         if perdas >= VIDAS:
-            pass 
+            end_screen(WIN, elapsed_time, alvo_clicado, click)
 
         draw(WIN, alvos)
         draw_top(WIN, elapsed_time, alvo_clicado, perdas)
         pygame.display.update()
 
+    pygame.quit()
 
 if __name__ == "__main__":
     main()

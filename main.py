@@ -90,9 +90,9 @@ def end_screen(win, elapsed_time, alvo_clicado, clicks):
     win.fill(BG_COLOR)
 
     # Textos
-    time_label = LABEL_FONT.render(f"Tempo: {format_time(elapsed_time)}", 1, "black")
+    time_label = LABEL_FONT.render(f"Tempo: {format_time(elapsed_time)}", 1, "white")
     speed = round(alvo_clicado / elapsed_time, 1)
-    speed_label = LABEL_FONT.render(f"Velocidade: {speed} alvos/segun.", 1, "black")
+    speed_label = LABEL_FONT.render(f"Velocidade: {speed} alvos/segun.", 1, "white")
     hits_label = LABEL_FONT.render(f"Pontos: {alvo_clicado}", 1, "black")
     end_message = LABEL_FONT.render("Pressione qualquer tecla para sair", 1, "white")
 

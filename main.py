@@ -4,7 +4,7 @@ import time
 import pygame
 pygame.init()
     
-WIDTH,HEIGHT = 700, 500
+WIDTH, HEIGHT = 700, 500
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Clique no alvo")
@@ -70,7 +70,7 @@ def format_time(secs):
 
 # 1- Dados na tela enquanto o jogo roda
 def draw_top(win, elapsed_time, alvo_clicado, perdas):
-    pygame.draw.rect(win, "grey", (0, 0, WIDTH,TOP_HEIGHT))
+    pygame.draw.rect(win, "grey", (0, 0, WIDTH, TOP_HEIGHT))
     time_label = LABEL_FONT.render(f"Tempo: {format_time(elapsed_time)}", 1, "black")
 
     speed = round(alvo_clicado / elapsed_time, 1)
@@ -86,23 +86,21 @@ def draw_top(win, elapsed_time, alvo_clicado, perdas):
     win.blit(vidas_label, (580, 5))
 
 # 2 - Dados no meio da tela quando termina o jogo
-def end_screen(win, elapsed_time, alvo_clicado, click):
-    win.blit(BG_COLOR)
+def end_screen(win, elapsed_time, alvo_clicado, clicks):
+    win.fill(BG_COLOR)
 
+    # Textos
     time_label = LABEL_FONT.render(f"Tempo: {format_time(elapsed_time)}", 1, "black")
-
     speed = round(alvo_clicado / elapsed_time, 1)
-    speed_label = LABEL_FONT.render(f"Velocidade: {speed} t/s", 1, "black")
-
+    speed_label = LABEL_FONT.render(f"Velocidade: {speed} alvos/segun.", 1, "black")
     hits_label = LABEL_FONT.render(f"Pontos: {alvo_clicado}", 1, "black")
+    end_message = LABEL_FONT.render("Pressione qualquer tecla para sair", 1, "white")
 
-    accuracy = round(alvo_clicado / click * 100, 1)
-    accuracy_label = LABEL_FONT.render(f"Precisão: {accuracy}%", 1, "black")
-
-    win.blit(time_label, (get_middle(time_label), 5))
-    win.blit(speed_label, (get_middle(speed_label), 5))
-    win.blit(hits_label, (get_middle(hits_label), 5))
-    win.blit(accuracy_label, (get_middle(accuracy_label), 5))
+    # Ajusta a posição dos textos na tela
+    win.blit(time_label, (get_middle(time_label), 100))
+    win.blit(speed_label, (get_middle(speed_label), 150))
+    win.blit(hits_label, (get_middle(hits_label), 200))
+    win.blit(end_message, (get_middle(end_message), 350))
 
     pygame.display.update()
 
@@ -110,7 +108,8 @@ def end_screen(win, elapsed_time, alvo_clicado, click):
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.KEYDOWN:
-                quit()
+                pygame.quit()
+                exit()
 
 def get_middle(surface):
     return WIDTH / 2 - surface.get_width()/ 2
@@ -130,7 +129,6 @@ def main():
 
     while run:
         clock.tick(60)
-        click = False
         mouse_pos = pygame.mouse.get_pos()
         elapsed_time = time.time() - start_time
 
@@ -146,8 +144,7 @@ def main():
                 alvos.append(alvo)
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                    click = True
-                    clicks += 1
+                clicks += 1
         
         for alvo in alvos:
             alvo.update()
@@ -156,12 +153,13 @@ def main():
                 alvos.remove(alvo)
                 perdas += 1
 
-            if click and alvo.collide(*mouse_pos):
+            if clicks and alvo.collide(*mouse_pos):
                 alvos.remove(alvo)
                 alvo_clicado += 1
 
         if perdas >= VIDAS:
-            end_screen(WIN, elapsed_time, alvo_clicado, click)
+            end_screen(WIN, elapsed_time, alvo_clicado, clicks)
+            run = False
 
         draw(WIN, alvos)
         draw_top(WIN, elapsed_time, alvo_clicado, perdas)
@@ -171,6 +169,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# classes dos alvos
-

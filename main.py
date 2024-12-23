@@ -74,7 +74,7 @@ def draw_top(win, elapsed_time, alvo_clicado, perdas):
     time_label = LABEL_FONT.render(f"Tempo: {format_time(elapsed_time)}", 1, "black")
 
     speed = round(alvo_clicado / elapsed_time, 1)
-    speed_label = LABEL_FONT.render(f"Velocidade: {speed} t/s", 1, "black")
+    speed_label = LABEL_FONT.render(f"Velocidade: {speed} a/s", 1, "black")
 
     hits_label = LABEL_FONT.render(f"Pontos: {alvo_clicado}", 1, "black")
 
